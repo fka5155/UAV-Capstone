@@ -275,8 +275,8 @@ def main():
 
     #
     set_mode_guided(connection)
-    time.sleep(10)
-    arm_disarm_drone(connection, 1)
+    #time.sleep(10)
+    #arm_disarm_drone(connection, 1)
 
     # # Take off to an altitude of 5 meters
     #time.sleep(2)

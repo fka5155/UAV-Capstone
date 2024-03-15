@@ -30,23 +30,38 @@ def connect_to_drone(connection_str):
     print("Connection failed: No heartbeat received.")
     return None
 
-def set_mode(connection, mode):
+# Set the mode of the drone
+def set_mode_guided(connection):
     """
-    Set the mode of the drone.
+    Set the drone's mode to GUIDED.
+
+    Args:
+        connection (mavutil.mavlink_connection): The connection to the drone.
+
+    Returns:
+        bool: True if the mode was successfully set, False otherwise.
     """
     connection.mav.command_long_send(
-    connection.target_system,
-    connection.target_component,
-    mavutil.mavlink.MAV_CMD_DO_SET_MODE,
-    0, mode, 0, 0, 0, 0, 0, 0)
+        connection.target_system, connection.target_component,
+        mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0,
+        mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, # Base mode
+        mavutil.mavlink.COPTER_MODE_GUIDED, 0, 0, 0, 0, 0 # Custom mode - GUIDED for Copter
+    )
 
     # Wait for the COMMAND_ACK message to be received
-    msg_guided = connection.recv_match(type='COMMAND_ACK', blocking=True)
-    if not msg_guided or msg_guided.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
-        print(f"Failed to set GUIDED mode: {msg_guided}")
+    msg = connection.recv_match(type='COMMAND_ACK', blocking=True)
+    if not msg:
+        print("No COMMAND_ACK message received for mode set")
         return False
-    print("GUIDED mode set successfully")
-    return True
+
+    if msg.command == mavutil.mavlink.MAV_CMD_DO_SET_MODE and msg.result == mavutil.mavlink.MAV_RESULT_ACCEPTED:
+        print("GUIDED mode set successfully")
+        return True
+
+    print(f"Failed to set GUIDED mode: {msg.result}")
+    return False
+
+
 
 # Arm the drone, pass the connection and command. command can be 0 or 1 0: Disarm, 1: Arm
 def arm_disarm_drone(connection, command):
@@ -258,28 +273,31 @@ def main():
     # Connect to the drone
     connection = connect_to_drone('tcp:127.0.0.1:5762')
 
-    #set_mode(connection, 1)
+    #
+    set_mode_guided(connection)
+    #time.sleep(10)
+    arm_disarm_drone(connection, 1)
 
-    #arm_disarm_drone(connection, 1)
-
-    # # Take off to an altitude of 5 meters
-    #takeoff_drone(connection, 5)
-
+    # # Take off to an altitude of 10 meters
+    time.sleep(2)
+    takeoff_drone(connection, 10)
+    time.sleep(12)
     # # Sequentially move the drone according to the specified pattern
     move_forward(connection, 10)
 
-    # move_right(connection, 2)
+    move_right(connection, 10)
 
-    # move_backward(connection, 2)
+    move_backward(connection, 10)
 
-    # move_left(connection, 2)
+    move_left(connection, 10)
 
-    # # Land the drone
-    # land_drone(connection)
+    # Land the drone
+    land_drone(connection)
 
     # # Disarm the drone after landing
-    # arm_disarm_drone(connection, 0)
+    #arm_disarm_drone(connection, 0)
 
 
 if __name__ == "__main__":
     main()
+
