@@ -18,6 +18,7 @@ def connect_to_drone(connection_str):
     Returns:
         mavutil.mavlink_connection: A connection object if successful, None otherwise.
     """
+    # telemetry baud = 57600 usb baud = 115200
     # Connect to the drone
     connection = mavutil.mavlink_connection(connection_str, baud=57600)
     # wait for the heartbeat message
@@ -78,7 +79,7 @@ def arm_disarm_drone(connection, command):
 
     connection.mav.command_long_send(
         connection.target_system, connection.target_component,
-        mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,0, command, 0, 0, 0, 0, 0, 0)
+        mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,0, command, 21196, 0, 0, 0, 0, 0)
 
     # Wait for the COMMAND_ACK message to be received
     msg = connection.recv_match(type='COMMAND_ACK', blocking=True)
@@ -268,15 +269,17 @@ def land_drone(connection):
     print("Drone landed successfully")
     return True
 
+
 def main():
     """Main function for the module. Demonstrates the usage of the functions in the module."""
     # Connect to the drone
     connection = connect_to_drone('COM6')
-
-    #
     set_mode_guided(connection)
-    #time.sleep(10)
-    #arm_disarm_drone(connection, 1)
+
+    # time.sleep(2)
+    arm_disarm_drone(connection, 1)
+    # time.sleep(3)
+    # arm_disarm_drone(connection, 0)
 
     # # Take off to an altitude of 5 meters
     #time.sleep(2)
