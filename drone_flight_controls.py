@@ -275,7 +275,7 @@ def main():
 
     #
     set_mode_guided(connection)
-    #time.sleep(10)
+    time.sleep(10)
     arm_disarm_drone(connection, 1)
 
     # # Take off to an altitude of 10 meters
@@ -294,8 +294,6 @@ def main():
     # Land the drone
     land_drone(connection)
 
-    # # Disarm the drone after landing
-    #arm_disarm_drone(connection, 0)
 
 
 if __name__ == "__main__":
