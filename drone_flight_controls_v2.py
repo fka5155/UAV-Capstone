@@ -20,7 +20,7 @@ def connect_to_drone(connection_str):
     """
     # telemetry baud = 57600 usb baud = 115200
     # Connect to the drone
-    connection = mavutil.mavlink_connection(connection_str, baud=57600)
+    connection = mavutil.mavlink_connection(connection_str, baud=115200)
     # wait for the heartbeat message
     msg = connection.recv_match(type='HEARTBEAT', blocking=True, timeout=10)
 
@@ -273,29 +273,29 @@ def land_drone(connection):
 def main():
     """Main function for the module. Demonstrates the usage of the functions in the module."""
     # Connect to the drone
-    connection = connect_to_drone('COM6')
+    connection = connect_to_drone('COM4')
     set_mode_guided(connection)
 
-    # time.sleep(2)
+    time.sleep(5)
     arm_disarm_drone(connection, 1)
-    # time.sleep(3)
-    # arm_disarm_drone(connection, 0)
+    #time.sleep(3)
+    #arm_disarm_drone(connection, 0)
 
-    # # Take off to an altitude of 5 meters
-    #time.sleep(2)
-    #takeoff_drone(connection, 10)
-    #time.sleep(12)
-    # # Sequentially move the drone according to the specified pattern
-    #move_forward(connection, 10)
+    # Take off to an altitude of 5 meters
+    time.sleep(5)
+    takeoff_drone(connection, 2)
+    time.sleep(5)
+    # Sequentially move the drone according to the specified pattern
+    move_forward(connection, 10)
 
-    #move_right(connection, 10)
+    move_right(connection, 10)
 
-    #move_backward(connection, 10)
+    move_backward(connection, 10)
 
-    #move_left(connection, 10)
+    move_left(connection, 10)
 
     # Land the drone
-    #land_drone(connection)
+    land_drone(connection)
 
     # # Disarm the drone after landing
     # arm_disarm_drone(connection, 0)
@@ -303,4 +303,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
