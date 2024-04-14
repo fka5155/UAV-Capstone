@@ -243,7 +243,7 @@ def move_left(connection, y_distance):
         y_distance: The distance in meters that the drone should move left for.
 
     Returns:
-         Boolean: True if the drone moved left successfully, False otherwise.
+        nothing
     """
     try:
         velocity = -1
@@ -265,7 +265,7 @@ def move_left(connection, y_distance):
 
 
         return True
-    
+
     except Exception as e:
         print(f"Error: Failed to move the drone forward due to {e}.")
         return False
@@ -322,23 +322,37 @@ def return_home(connection):
     else:
         print("Command was not executed successfully. Result code:", connection.result)
 
-def rotate_drone(connection, angle):
+def rotate_drone(connection, angle, clockwise):
+
     """
     Instruct the drone to rotate a certain angle.
 
     Args:
         connection (mavutil.mavlink_connection): The connection to the drone.
         angle: The angle in degrees that the drone should rotate.
+        clockwise: The direction of rotation, 1 for clockwise, -1 for counter-clockwise.
 
     Returns:
-        nothing
+        Boolean: True if the drone rotated successfully, False otherwise.
     """
-    type_mask = int(0b100111111111)
-    # Command to rotate
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, angle, 0)
+
+    t = angle / 25
+    try:
+        connection.mav.command_long_send(
+            connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_CMD_CONDITION_YAW,
+            0, angle, 25, clockwise, 1, 0, 0, 0, 0)
+
+        time.sleep(t)
+
+        return True
+
+    except Exception as e:
+        print(f"Error: Failed to rotate the drone due to {e}.")
+        return False
+
+
 
 
 def main():
