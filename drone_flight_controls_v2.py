@@ -20,7 +20,7 @@ def connect_to_drone(connection_str):
     """
     # telemetry baud = 57600 usb baud = 115200
     # Connect to the drone
-    connection = mavutil.mavlink_connection(connection_str, baud=115200)
+    connection = mavutil.mavlink_connection(connection_str, baud=57600)
     # wait for the heartbeat message
     msg = connection.recv_match(type='HEARTBEAT', blocking=True, timeout=10)
 
@@ -132,25 +132,33 @@ def move_forward(connection, x_distance):
         x_distance: The distance in meters that the drone should move forward for.
 
     Returns:
-        nothing
+        Boolean: True if the drone moved forward successfully, False otherwise.
     """
-    velocity = 1
-    move_time = x_distance / velocity
-    type_mask = int(0b0000111111000111)
-    # Command to move forward
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0, 0 )
+    try:
+        velocity = 1
+        move_time = x_distance / velocity
+        type_mask = int(0b0000111111000111)
+        # Command to move forward
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0, 0 )
 
 
-    # Wait for the drone to move the desired distance
-    time.sleep(move_time)
+        # Wait for the drone to move the desired distance
+        time.sleep(move_time)
 
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+        return True
+
+    except Exception as e:
+        print(f"Error: Failed to move the drone forward due to {e}.")
+        return False
+
 
 # move backward x meters
 def move_backward(connection, x_distance):
@@ -162,24 +170,32 @@ def move_backward(connection, x_distance):
         x_distance: The distance in meters that the drone should move backward for.
 
     Returns:
-        nothing
+        Boolean: True if the drone moved backward successfully, False otherwise.
     """
-    velocity = -1
-    move_time = x_distance / abs(velocity)
-    type_mask = int(0b0000111111000111)
-    # Command to move backward
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0, 0 )
+    try:
+        velocity = -1
+        move_time = x_distance / abs(velocity)
+        type_mask = int(0b0000111111000111)
+        # Command to move backward
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0, 0 )
 
-    # Wait for the drone to move the desired distance
-    time.sleep(move_time)
+        # Wait for the drone to move the desired distance
+        time.sleep(move_time)
 
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+
+        return True
+
+
+    except Exception as e:
+        print(f"Error: Failed to move the drone forward due to {e}.")
+        return False
 
 # move right y meters
 def move_right(connection, y_distance):
@@ -191,24 +207,32 @@ def move_right(connection, y_distance):
         y_distance: The distance in meters that the drone should move right for.
 
     Returns:
-        nothing
+        Boolean: True if the drone moved right successfully, False otherwise.
     """
-    velocity = 1
-    move_time = y_distance / velocity
-    type_mask = int(0b0000111111000111)
-    # Command to move right
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0 )
+    try:
+        velocity = 1
+        move_time = y_distance / velocity
+        type_mask = int(0b0000111111000111)
+        # Command to move right
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0 )
 
-    # Wait for the drone to move the desired distance
-    time.sleep(move_time)
+        # Wait for the drone to move the desired distance
+        time.sleep(move_time)
 
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+
+
+        return True
+
+    except Exception as e:
+        print(f"Error: Failed to move the drone forward due to {e}.")
+        return False
 
 def move_left(connection, y_distance):
     """
@@ -219,24 +243,32 @@ def move_left(connection, y_distance):
         y_distance: The distance in meters that the drone should move left for.
 
     Returns:
-        nothing
+         Boolean: True if the drone moved left successfully, False otherwise.
     """
-    velocity = -1
-    move_time = y_distance / abs(velocity)
-    type_mask = int(0b0000111111000111)
-    # Command to move left
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0 )
+    try:
+        velocity = -1
+        move_time = y_distance / abs(velocity)
+        type_mask = int(0b0000111111000111)
+        # Command to move left
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, velocity, 0, 0, 0, 0, 0, 0 )
 
-    # Wait for the drone to move the desired distance
-    time.sleep(move_time)
+        # Wait for the drone to move the desired distance
+        time.sleep(move_time)
 
-    connection.mav.set_position_target_local_ned_send(
-        0, connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+        connection.mav.set_position_target_local_ned_send(
+            0, connection.target_system,
+            connection.target_component,
+            mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
+
+
+        return True
+    
+    except Exception as e:
+        print(f"Error: Failed to move the drone forward due to {e}.")
+        return False
 
 def land_drone(connection):
     """
@@ -269,32 +301,69 @@ def land_drone(connection):
     print("Drone landed successfully")
     return True
 
+def return_home(connection):
+    """
+    instructs the drone to retun to home location.
+
+    Args:
+        connection (mavutil.mavlink_connection): The connection to the drone.
+
+    Returns:
+        int or None: The result from COMMAND_ACK or None if no ACK was received.
+    """
+    connection.mav.command_long_send(
+    connection.target_system,
+    connection.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+    0, 0, 0, 0, 0, 0, 0, 0)
+
+    if connection.result == mavutil.mavlink.MAV_RESULT_ACCEPTED:
+        print("Command was accepted and executed successfully.")
+    else:
+        print("Command was not executed successfully. Result code:", connection.result)
+
+def rotate_drone(connection, angle):
+    """
+    Instruct the drone to rotate a certain angle.
+
+    Args:
+        connection (mavutil.mavlink_connection): The connection to the drone.
+        angle: The angle in degrees that the drone should rotate.
+
+    Returns:
+        nothing
+    """
+    type_mask = int(0b100111111111)
+    # Command to rotate
+    connection.mav.set_position_target_local_ned_send(
+        0, connection.target_system,
+        connection.target_component,
+        mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,type_mask, 0, 0, 0, 0, 0, 0, 0, 0, 0, angle, 0)
+
 
 def main():
     """Main function for the module. Demonstrates the usage of the functions in the module."""
     # Connect to the drone
-    connection = connect_to_drone('COM4')
+    connection = connect_to_drone('COM6')
     set_mode_guided(connection)
 
     time.sleep(5)
     arm_disarm_drone(connection, 1)
-    #time.sleep(3)
-    #arm_disarm_drone(connection, 0)
 
     # Take off to an altitude of 5 meters
     time.sleep(5)
     takeoff_drone(connection, 2)
+    time.sleep(10)
+    # # Sequentially move the drone according to the specified pattern
+    move_forward(connection, 2)
     time.sleep(5)
-    # Sequentially move the drone according to the specified pattern
-    move_forward(connection, 10)
+    # move_right(connection, 10)
 
-    move_right(connection, 10)
+    # move_backward(connection, 10)
 
-    move_backward(connection, 10)
+    # move_left(connection, 10)
 
-    move_left(connection, 10)
-
-    # Land the drone
+    # # Land the drone
     land_drone(connection)
 
     # # Disarm the drone after landing
