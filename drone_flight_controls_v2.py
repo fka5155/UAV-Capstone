@@ -243,7 +243,7 @@ def move_left(connection, y_distance):
         y_distance: The distance in meters that the drone should move left for.
 
     Returns:
-        nothing
+        Boolean: True if the drone moved left successfully, False otherwise.
     """
     try:
         velocity = -1
@@ -309,18 +309,25 @@ def return_home(connection):
         connection (mavutil.mavlink_connection): The connection to the drone.
 
     Returns:
-        int or None: The result from COMMAND_ACK or None if no ACK was received.
+        Boolean: True if the drone returned home successfully, False otherwise.
     """
-    connection.mav.command_long_send(
-    connection.target_system,
-    connection.target_component,
-    mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
-    0, 0, 0, 0, 0, 0, 0, 0)
 
-    if connection.result == mavutil.mavlink.MAV_RESULT_ACCEPTED:
+    try:
+        connection.mav.command_long_send(
+        connection.target_system,
+        connection.target_component,
+        mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH,
+        0, 0, 0, 0, 0, 0, 0, 0)
+
         print("Command was accepted and executed successfully.")
-    else:
+        return True
+
+    except Exception as e:
+        print(f"Error: Failed to return home due to {e}.")
         print("Command was not executed successfully. Result code:", connection.result)
+        return False
+
+
 
 def rotate_drone(connection, angle, clockwise):
 
